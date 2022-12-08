@@ -1,9 +1,12 @@
+// https://github.com/ethz-asl/rotors_simulator/blob/master/rotors_gazebo/src/hovering_example.cpp
+
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <ompl/control/planners/sst/SST.h>
 #include <ompl/control/SimpleSetup.h>
+#include <ompl/control/PathControl.h>
 #include <ompl/config.h>
 #include <ros/ros.h>
 #include <tf/transform_datatypes.h>
@@ -27,7 +30,6 @@ public:
     {
         const double *u = control->as<oc::RealVectorControlSpace::ControlType>()->values;
         auto angles = state->as<ob::SE3StateSpace::StateType>();
-        // auto angles = ss->as<ob::SO3StateSpace::StateType>();
         tf::Quaternion q(angles->rotation().x, angles->rotation().y, angles->rotation().z, angles->rotation().w);
         q.normalize();
         tf::Matrix3x3 m(q);
@@ -47,7 +49,6 @@ public:
     {
         ob::SE3StateSpace::StateType &s = *state->as<ob::SE3StateSpace::StateType>();
         s.setXYZ(s.getX() + dstate[0], s.getY() + dstate[1], s.getZ() + dstate[2]);
-        /*Quaternion to euler from previous state use .w(), .vec() from .rotation()*/
         tf::Quaternion q(s.rotation().x, s.rotation().y, s.rotation().z, s.rotation().w);
         tf::Matrix3x3 m(q);
         double roll, pitch, yaw;
@@ -127,7 +128,13 @@ bool isStateValid(const oc::SpaceInformation *si, const ob::State *state)
     const auto *se3state = state->as<ob::SE3StateSpace::StateType>();
 
     const auto *pos = se3state->as<ob::RealVectorStateSpace::StateType>(0);
-
+    double x = pos->values[0], y = pos->values[1], z = pos->values[2];
+    if(x < 5 && x > 4 && y < 5 && y > 1 && z <= 5 && z > 0){
+        return false;
+    }
+    if(x < 9 && x > 8 && y < 5 && y > 1 && z <= 10 && z > 5){
+        return false;
+    }
     const auto *rot = se3state->as<ob::SO3StateSpace::StateType>(1);
 
     // return a value that is always true but uses the two variables we define, so we avoid compiler warnings
@@ -176,11 +183,11 @@ void planWithSimpleSetup()
     auto space(std::make_shared<ob::SE3StateSpace>());
 
     ob::RealVectorBounds bounds(3);
-    bounds.setLow(0,-1.0);
+    bounds.setLow(0, 0.0);
     bounds.setHigh(0,10.0);
-    bounds.setLow(1,-1.0);
+    bounds.setLow(1,0.0);
     bounds.setHigh(1,10.0);
-    bounds.setLow(2,-1.0);
+    bounds.setLow(2,0.5);
     bounds.setHigh(2,10.0);
 
     space->setBounds(bounds);
@@ -212,7 +219,7 @@ void planWithSimpleSetup()
     ob::ScopedState<ob::SE3StateSpace> start(space);
     start->setX(1.0);
     start->setY(1.0);
-    start->setZ(0.0);
+    start->setZ(5.0);
     start->rotation().setAxisAngle(0,0,0,1);
 
     ob::ScopedState<ob::SE3StateSpace> goal(space);
@@ -221,26 +228,37 @@ void planWithSimpleSetup()
     goal->setZ(10.0);
     goal->rotation().setAxisAngle(0,0,0,1);
 
-    double sst_selection_radius = 0.2;
-    double sst_pruning_radius = 0.1;
-    auto sst_planner(std::make_shared<oc::SST>(ss.getSpaceInformation()));
+    double sst_selection_radius = 4;
+    double sst_pruning_radius = 2;
+    double epsilon1 = 0.9, epsilon2 = 0.9; 
+    ob::PlannerStatus solved; 
 
-    sst_planner->setSelectionRadius(sst_selection_radius); // default 0.2
-    sst_planner->setPruningRadius(sst_pruning_radius); // default 0.1
+    for(int  i = 0; i < 100; i++){
+        auto sst_planner(std::make_shared<oc::SST>(ss.getSpaceInformation()));
+        sst_planner->setSelectionRadius(sst_selection_radius); // default 0.2
+        sst_planner->setPruningRadius(sst_pruning_radius); // default 0.1
 
-    ss.setPlanner(sst_planner);
+        ss.setPlanner(sst_planner);
+        ss.setStartAndGoalStates(start, goal, 1);
 
-    ss.setPlanner(sst_planner);
-    ss.setStartAndGoalStates(start, goal, 1);
+        ss.setup();
+        propagator->setIntegrationTimeStep(si->getPropagationStepSize());
 
-    ss.setup();
-    propagator->setIntegrationTimeStep(si->getPropagationStepSize());
-
-    ob::PlannerStatus solved = ss.solve(40.0);
+        solved = ss.solve(0.1);
+        std::cout << "Selection Radius: " << sst_selection_radius << " Pruning Radius: " << sst_pruning_radius << std::endl;
+        sst_selection_radius *= epsilon1;
+        sst_pruning_radius *= epsilon2;
+    }
 
     if (solved)
     {
         std::cout << "Found solution:" << std::endl;
+        oc::PathControl myPath = ss.getSolutionPath();
+        auto cc = myPath.getControls()[0]->as<oc::RealVectorControlSpace::ControlType>()->values;
+        for(int i = 0; i < 3; i++){
+            std::cout << "Controls: " << cc[i] << std::endl;
+        }
+        std::cout << "Duration: " << myPath.getControlDuration(0) << std::endl;
         ss.getSolutionPath().asGeometric().printAsMatrix(std::cout);
     }
     else

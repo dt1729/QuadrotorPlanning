@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -Wall -std=c++11 -g -O0 -std=c++11  -shared -Wl,-soname,libgmock_maind.so -o ../lib/libgmock_maind.so CMakeFiles/gmock_main.dir/src/gmock_main.cc.o  -Wl,-rpath,/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/gtest/lib ../lib/libgmockd.so ../lib/libgtestd.so -lpthread 

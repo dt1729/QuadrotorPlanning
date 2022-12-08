@@ -1,0 +1,8 @@
+prefix=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/devel
+
+Name: se3ompl
+Description: Description of se3ompl
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib -lrviz_tf_marker
+Requires: geometry_msgs tf tf2_msgs tf2_ros roscpp rviz
