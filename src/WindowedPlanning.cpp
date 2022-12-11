@@ -16,12 +16,9 @@
 #include <limits>
 #include <fstream>
 
-
 /*
 TODOS:
-
     ./../build/devel/lib/se3ompl/DynamicPlanning
-
 */
 
 struct obs{

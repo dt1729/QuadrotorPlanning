@@ -37,8 +37,15 @@ colors[cube1] = 'blue'
 colors[cube2] = 'green'
 
 # and plot everything
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.voxels(voxels, facecolors=colors, edgecolor='k')
-ax.plot(data[:,0],data[:,1],data[:,2],'.-')
-plt.show()
+for i in range(len(data[:,0])-1):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.voxels(voxels, facecolors=colors, edgecolor='k')
+    ax.plot(data[1:i,0],data[1:i,1],data[1:i,2],'.b')
+    ax.set_xlabel("X axes")
+    ax.set_ylabel("Y axes")
+    ax.set_zlabel("Z axes")
+    aa = str(i) + ".png"
+    print(i)
+    fig.savefig(aa)
+    plt.close(fig)
