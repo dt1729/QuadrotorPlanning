@@ -1,5 +1,5 @@
-// https://github.com/ethz-asl/rotors_simulator/blob/master/rotors_gazebo/src/hovering_example.cpp
-
+#include <iostream>
+#include <string>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -15,6 +15,38 @@
 #include <valarray>
 #include <limits>
 #include <fstream>
+
+
+/*
+TODOS:
+
+    ./../build/devel/lib/se3ompl/DynamicPlanning
+
+*/
+
+struct obs{
+    double xmax = 0, ymax = 0, zmax = 0;
+    double xmin = 0, ymin = 0, zmin = 0;
+};
+
+std::vector<obs> obstacles; //
+
+double lowX = 0; 
+double lowY = 0;
+double lowZ = 0;
+
+
+double highX = 0;
+double highY = 0;
+double highZ = 0;
+
+double sceneMaxX = 50;
+double sceneMinX = 0;
+
+int window_start_idx = 0;
+int window_end_idx = 0;
+
+double robotStartX = 1.0, robotStartY = 1, robotStartZ = 5.0;
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -131,12 +163,12 @@ bool isStateValid(const oc::SpaceInformation *si, const ob::State *state)
 
     const auto *pos = se3state->as<ob::RealVectorStateSpace::StateType>(0);
     double x = pos->values[0], y = pos->values[1], z = pos->values[2];
-    if(x < 5 && x > 4 && y < 5 && y > 1 && z <= 5 && z > 0){
-        return false;
+    for(int i = ::window_start_idx; i < ::window_end_idx; i++){
+        if(x < ::obstacles[i].xmax && x > ::obstacles[i].xmin && y < ::obstacles[i].ymax && y > ::obstacles[i].ymin && z <= ::obstacles[i].zmax && z > ::obstacles[i].zmin){
+            return false;
+        }
     }
-    if(x < 9 && x > 8 && y < 5 && y > 1 && z <= 10 && z > 5){
-        return false;
-    }
+
     const auto *rot = se3state->as<ob::SO3StateSpace::StateType>(1);
 
     // return a value that is always true but uses the two variables we define, so we avoid compiler warnings
@@ -179,14 +211,13 @@ public:
     EulerIntegrator<QuadRotorModel> integrator_;
 };
 
-
-void planWithSimpleSetup()
+oc::PathControl planWithSimpleSetup()
 {
     auto space(std::make_shared<ob::SE3StateSpace>());
 
     ob::RealVectorBounds bounds(3);
-    bounds.setLow(0, 0.0);
-    bounds.setHigh(0,10.0);
+    bounds.setLow(0, ::lowX);
+    bounds.setHigh(0,::highX);
     bounds.setLow(1,0.0);
     bounds.setHigh(1,10.0);
     bounds.setLow(2,0.5);
@@ -219,13 +250,13 @@ void planWithSimpleSetup()
     ss.setStatePropagator(propagator);
 
     ob::ScopedState<ob::SE3StateSpace> start(space);
-    start->setX(1.0);
-    start->setY(1.0);
-    start->setZ(5.0);
+    start->setX(::robotStartX);
+    start->setY(::robotStartY);
+    start->setZ(::robotStartZ);
     start->rotation().setAxisAngle(0,0,0,1);
 
     ob::ScopedState<ob::SE3StateSpace> goal(space);
-    goal->setX(10.0);
+    goal->setX(::highX); // Todo change goal def
     goal->setY(3.5);
     goal->setZ(10.0);
     goal->rotation().setAxisAngle(0,0,0,1);
@@ -269,13 +300,69 @@ void planWithSimpleSetup()
     }
     else
         std::cout << "No solution found" << std::endl;
+    return ss.getSolutionPath();
 }
+
+void defineObstacles(){
+    obs a; a.xmax = 2; a.ymax = 5; a.zmax = 5; a.xmin = 1; a.ymin = 0; a.zmin = 0;
+    obs b; b.xmax = 9; b.ymax = 5; b.zmax = 5; b.xmin = 8; b.ymin = 0; b.zmin = 0; 
+    obs c; c.xmax = 12; c.ymax = 5; c.zmax = 5; c.xmin = 10; c.ymin = 0; c.zmin = 0; 
+    obs d; d.xmax = 15; d.ymax = 5; d.zmax = 5; d.xmin = 14; d.ymin = 0; d.zmin = 0; 
+    obs e; e.xmax = 23; e.ymax = 5; e.zmax = 5; e.xmin = 20; e.ymin = 0; e.zmin = 0; 
+    ::obstacles.push_back(a); ::obstacles.push_back(b); ::obstacles.push_back(c);
+    ::obstacles.push_back(d); ::obstacles.push_back(e);
+}
+
+void sceneExtend(){
+    if(::window_end_idx == obstacles.size() - 1){
+            ::window_end_idx = obstacles.size() - 1;
+            ::window_start_idx = 0;
+            ::highX = 50;    
+            return;
+    }
+    for(int i = window_end_idx; i < obstacles.size(); i++){
+        if(::obstacles[i].xmax > ::highX + 3){
+            ::window_end_idx = i;
+            ::window_start_idx = 0;
+            ::highX = std::min(::obstacles[i].xmax + 1, ::sceneMaxX);
+            break;
+        }
+        if((obstacles[i].xmax < ::highX + 3 && obstacles[i].xmin > ::highX - 3)){
+            ::window_end_idx = i;
+            ::window_start_idx = 0;
+            ::highX = std::min(::obstacles[i].xmax + 3, ::sceneMaxX);
+            break;
+        }
+    }
+}
+
+void executePath(std::vector<ob::State*> path, int replanCount){
+    int count = 0;
+    std::ofstream outfile ("paths" + std::to_string(replanCount) + ".txt", std::ofstream::binary);
+    while(count < int(path.size()*0.8)){
+        ob::SE3StateSpace::StateType *s = path[count]->as<ob::SE3StateSpace::StateType>();
+        outfile << s->getX() << " " << s->getY() << " " << s->getZ() << std::endl; 
+        count++;
+    }
+    ob::SE3StateSpace::StateType *s = path[count]->as<ob::SE3StateSpace::StateType>();
+    ::robotStartX = s->getX(), ::robotStartY = s->getY(), ::robotStartZ = s->getZ();
+}
+
 
 int main(int /*argc*/, char ** /*argv*/)
 {
     std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
 
-    planWithSimpleSetup();
-
+    // planWithSimpleSetup();
+    int cc  = 0;
+    defineObstacles();
+    while(!(::robotStartX < 50 && robotStartX > 45)){
+        std::cout << "Start: " << robotStartX << " End: " <<  ::highX << std::endl;
+        sceneExtend();
+        auto path = planWithSimpleSetup();
+        std::vector<ob::State*> pathVal = path.getStates();
+        executePath(pathVal, cc);
+        cc++;
+    }
     return 0;
 }

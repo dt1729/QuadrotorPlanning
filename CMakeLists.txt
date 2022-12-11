@@ -43,3 +43,7 @@ find_package(Boost COMPONENTS system REQUIRED)
 
 add_executable(OMPL_SE3 src/SimpleMotionPlanning.cpp)
 target_link_libraries(OMPL_SE3 ${OMPL_LIBRARIES} ${catkin_LIBRARIES})
+
+add_executable(DynamicPlanning src/WindowedPlanning.cpp)
+target_link_libraries(DynamicPlanning ${OMPL_LIBRARIES} ${catkin_LIBRARIES})
+

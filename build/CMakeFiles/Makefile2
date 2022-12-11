@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/DynamicPlanning.dir/all
 all: CMakeFiles/OMPL_SE3.dir/all
 all: gtest/all
 
@@ -64,6 +65,7 @@ preinstall: gtest/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/DynamicPlanning.dir/clean
 clean: CMakeFiles/OMPL_SE3.dir/clean
 clean: CMakeFiles/std_srvs_generate_messages_nodejs.dir/clean
 clean: CMakeFiles/std_srvs_generate_messages_lisp.dir/clean
@@ -202,13 +204,40 @@ gtest/googletest/clean: gtest/googletest/CMakeFiles/gtest.dir/clean
 .PHONY : gtest/googletest/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/DynamicPlanning.dir
+
+# All Build rule for target.
+CMakeFiles/DynamicPlanning.dir/all:
+	$(MAKE) -f CMakeFiles/DynamicPlanning.dir/build.make CMakeFiles/DynamicPlanning.dir/depend
+	$(MAKE) -f CMakeFiles/DynamicPlanning.dir/build.make CMakeFiles/DynamicPlanning.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=1,2 "Built target DynamicPlanning"
+.PHONY : CMakeFiles/DynamicPlanning.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/DynamicPlanning.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/DynamicPlanning.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles 0
+.PHONY : CMakeFiles/DynamicPlanning.dir/rule
+
+# Convenience name for target.
+DynamicPlanning: CMakeFiles/DynamicPlanning.dir/rule
+
+.PHONY : DynamicPlanning
+
+# clean rule for target.
+CMakeFiles/DynamicPlanning.dir/clean:
+	$(MAKE) -f CMakeFiles/DynamicPlanning.dir/build.make CMakeFiles/DynamicPlanning.dir/clean
+.PHONY : CMakeFiles/DynamicPlanning.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/OMPL_SE3.dir
 
 # All Build rule for target.
 CMakeFiles/OMPL_SE3.dir/all:
 	$(MAKE) -f CMakeFiles/OMPL_SE3.dir/build.make CMakeFiles/OMPL_SE3.dir/depend
 	$(MAKE) -f CMakeFiles/OMPL_SE3.dir/build.make CMakeFiles/OMPL_SE3.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=1,2 "Built target OMPL_SE3"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=3,4 "Built target OMPL_SE3"
 .PHONY : CMakeFiles/OMPL_SE3.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2261,7 +2290,7 @@ gtest/googlemock/CMakeFiles/gmock_main.dir/all: gtest/googlemock/CMakeFiles/gmoc
 gtest/googlemock/CMakeFiles/gmock_main.dir/all: gtest/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/depend
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=5,6 "Built target gmock_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=7,8 "Built target gmock_main"
 .PHONY : gtest/googlemock/CMakeFiles/gmock_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2288,7 +2317,7 @@ gtest/googlemock/CMakeFiles/gmock_main.dir/clean:
 gtest/googlemock/CMakeFiles/gmock.dir/all: gtest/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/depend
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=3,4 "Built target gmock"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=5,6 "Built target gmock"
 .PHONY : gtest/googlemock/CMakeFiles/gmock.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2315,7 +2344,7 @@ gtest/googlemock/CMakeFiles/gmock.dir/clean:
 gtest/googletest/CMakeFiles/gtest_main.dir/all: gtest/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest_main.dir/build.make gtest/googletest/CMakeFiles/gtest_main.dir/depend
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest_main.dir/build.make gtest/googletest/CMakeFiles/gtest_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=9,10 "Built target gtest_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=11,12 "Built target gtest_main"
 .PHONY : gtest/googletest/CMakeFiles/gtest_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2342,7 +2371,7 @@ gtest/googletest/CMakeFiles/gtest_main.dir/clean:
 gtest/googletest/CMakeFiles/gtest.dir/all:
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest.dir/build.make gtest/googletest/CMakeFiles/gtest.dir/depend
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest.dir/build.make gtest/googletest/CMakeFiles/gtest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=7,8 "Built target gtest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/build/CMakeFiles --progress-num=9,10 "Built target gtest"
 .PHONY : gtest/googletest/CMakeFiles/gtest.dir/all
 
 # Build rule for subdir invocation for target.

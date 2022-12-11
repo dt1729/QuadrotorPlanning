@@ -6,7 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/src/SimpleMotionPlanning.cpp
+/home/dt/Classes-Fall22/Motion-Planning-Classes/Project/src/WindowedPlanning.cpp
+iostream
+-
+string
+-
 ompl/control/SpaceInformation.h
 -
 ompl/base/goals/GoalState.h
